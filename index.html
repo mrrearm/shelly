@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciao Shelly!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #e8f5e8, #c3e6c3, #a8d4a8);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .kitten-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .kitten {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .kitten-head {
+            width: 120px;
+            height: 120px;
+            background: #4a4a4a;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .kitten-ears {
+            position: absolute;
+            top: -25px;
+            width: 100%;
+        }
+
+        .ear {
+            width: 32px;
+            height: 37px;
+            background: #4a4a4a;
+            position: absolute;
+            animation: wiggle 3s infinite;
+        }
+
+        .ear.left {
+            left: 18px;
+            clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+            transform: rotate(-15deg);
+        }
+
+        .ear.right {
+            right: 18px;
+            clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+            transform: rotate(15deg);
+        }
+
+        .ear-inner {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 22px;
+            background: #ffb3ba;
+            clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+        }
+
+        .kitten-eyes {
+            position: absolute;
+            top: 32px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 22px;
+        }
+
+        .eye {
+            width: 26px;
+            height: 30px;
+            background: #228B22;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            animation: blink 4s infinite;
+            box-shadow: 0 0 18px rgba(34, 139, 34, 0.7);
+        }
+
+        .eye::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 7px;
+            height: 7px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 14px;
+            background: #000;
+            border-radius: 2px;
+        }
+
+        .kitten-nose {
+            position: absolute;
+            top: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid #ffb3ba;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .kitten-mouth {
+            position: absolute;
+            top: 76px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 38px;
+            height: 20px;
+            border: 3px solid #ffb3ba;
+            border-top: none;
+            border-radius: 0 0 38px 38px;
+        }
+
+        .whiskers {
+            position: absolute;
+            top: 58px;
+            width: 100%;
+            height: 22px;
+        }
+
+        .whisker {
+            position: absolute;
+            width: 42px;
+            height: 2px;
+            background: #666;
+            border-radius: 1px;
+        }
+
+        .whisker.left-1 { left: -22px; top: 0; transform: rotate(-12deg); }
+        .whisker.left-2 { left: -22px; top: 9px; transform: rotate(12deg); }
+        .whisker.right-1 { right: -22px; top: 0; transform: rotate(12deg); }
+        .whisker.right-2 { right: -22px; top: 9px; transform: rotate(-12deg); }
+
+        .kitten-body {
+            width: 90px;
+            height: 70px;
+            background: #4a4a4a;
+            border-radius: 45px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .kitten-paw {
+            position: absolute;
+            width: 24px;
+            height: 40px;
+            background: #4a4a4a;
+            border-radius: 12px;
+            bottom: -34px;
+        }
+
+        .paw-left {
+            left: 18px;
+            animation: wave 2s infinite ease-in-out;
+        }
+
+        .paw-right {
+            right: 18px;
+        }
+
+        .kitten-tail {
+            position: absolute;
+            right: -45px;
+            top: 45px;
+            width: 70px;
+            height: 12px;
+            background: #4a4a4a;
+            border-radius: 6px;
+            transform-origin: left center;
+            animation: tailWag 1.2s infinite ease-in-out;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: -85px;
+            right: -145px;
+            background: #f0fff0;
+            padding: 18px 24px;
+            border-radius: 28px;
+            border: 3px solid #90c695;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            font-size: 17px;
+            font-weight: bold;
+            color: #2d5a2d;
+            white-space: nowrap;
+            animation: float 3s infinite ease-in-out;
+            z-index: 20;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 32px;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 14px solid #f0fff0;
+        }
+
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 22px;
+            color: #90c695;
+            animation: floatUp 4s infinite linear;
+        }
+
+        .paw-prints {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .paw-print {
+            position: absolute;
+            font-size: 32px;
+            color: rgba(74, 74, 74, 0.2);
+            animation: fadeInOut 6s infinite;
+        }
+
+        .title {
+            font-size: 3.2rem;
+            color: #2d5a2d;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            text-align: center;
+            animation: pulse 2s infinite;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            color: #4a7c4a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .sweet-messages {
+            max-width: 620px;
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(240, 255, 240, 0.85);
+            border-radius: 25px;
+            border: 3px solid #90c695;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .message {
+            font-size: 1.2rem;
+            color: #2d5a2d;
+            margin: 18px 0;
+            line-height: 1.7;
+            opacity: 0;
+            animation: fadeInMessage 0.8s ease-in-out forwards;
+            font-weight: 500;
+        }
+
+        .message:nth-child(1) { animation-delay: 0.5s; }
+        .message:nth-child(2) { animation-delay: 1s; }
+        .message:nth-child(3) { animation-delay: 1.5s; }
+        .message:nth-child(4) { animation-delay: 2s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-22px); }
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-35deg); }
+            75% { transform: rotate(35deg); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(-28deg); }
+        }
+
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(35deg); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(10vh) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tablet Styles */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 2.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .kitten {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .kitten-head {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .speech-bubble {
+                font-size: 15px;
+                padding: 15px 20px;
+                right: -130px;
+                top: -80px;
+            }
+            
+            .sweet-messages {
+                max-width: 500px;
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .message {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Mobile Large Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                justify-content: flex-start;
+                padding-top: 40px;
+            }
+            
+            .title {
+                font-size: 2.4rem;
+                margin-bottom: 15px;
+            }
+            
+            .subtitle {
+                font-size: 1.3rem;
+                margin-bottom: 25px;
+            }
+            
+            .kitten {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .kitten-head {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .kitten-ears {
+                top: -20px;
+            }
+            
+            .ear {
+                width: 28px;
+                height: 32px;
+            }
+            
+            .ear.left {
+                left: 16px;
+            }
+            
+            .ear.right {
+                right: 16px;
+            }
+            
+            .kitten-eyes {
+                top: 28px;
+                padding: 0 18px;
+            }
+            
+            .eye {
+                width: 22px;
+                height: 26px;
+            }
+            
+            .kitten-body {
+                width: 75px;
+                height: 60px;
+            }
+            
+            .kitten-paw {
+                width: 20px;
+                height: 35px;
+                bottom: -30px;
+            }
+            
+            .paw-left {
+                left: 15px;
+            }
+            
+            .paw-right {
+                right: 15px;
+            }
+            
+            .kitten-tail {
+                right: -40px;
+                top: 40px;
+                width: 60px;
+                height: 10px;
+            }
+            
+            .speech-bubble {
+                font-size: 13px;
+                padding: 12px 16px;
+                right: -110px;
+                top: -70px;
+                border-radius: 20px;
+            }
+            
+            .speech-bubble::after {
+                bottom: -10px;
+                left: 25px;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 10px solid #f0fff0;
+            }
+            
+            .sweet-messages {
+                margin: 20px 10px;
+                padding: 18px;
+                border-radius: 20px;
+            }
+            
+            .message {
+                font-size: 1.05rem;
+                margin: 15px 0;
+                line-height: 1.6;
+            }
+            
+            .heart {
+                font-size: 18px;
+            }
+            
+            .paw-print {
+                font-size: 24px;
+            }
+        }
+
+        /* Mobile Small Styles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                padding-top: 30px;
+            }
+            
+            .title {
+                font-size: 2rem;
+                margin-bottom: 12px;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+            
+            .kitten {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .kitten-head {
+                width: 85px;
+                height: 85px;
+            }
+            
+            .kitten-ears {
+                top: -18px;
+            }
+            
+            .ear {
+                width: 24px;
+                height: 28px;
+            }
+            
+            .ear.left {
+                left: 14px;
+            }
+            
+            .ear.right {
+                right: 14px;
+            }
+            
+            .kitten-eyes {
+                top: 24px;
+                padding: 0 15px;
+            }
+            
+            .eye {
+                width: 18px;
+                height: 22px;
+            }
+            
+            .kitten-nose {
+                top: 50px;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 8px solid #ffb3ba;
+            }
+            
+            .kitten-mouth {
+                top: 58px;
+                width: 30px;
+                height: 16px;
+                border-width: 2px;
+                border-radius: 0 0 30px 30px;
+            }
+            
+            .whiskers {
+                top: 46px;
+            }
+            
+            .whisker {
+                width: 32px;
+                height: 1.5px;
+            }
+            
+            .whisker.left-1, .whisker.left-2 { left: -18px; }
+            .whisker.right-1, .whisker.right-2 { right: -18px; }
+            
+            .kitten-body {
+                width: 65px;
+                height: 50px;
+            }
+            
+            .kitten-paw {
+                width: 18px;
+                height: 30px;
+                bottom: -25px;
+            }
+            
+            .paw-left {
+                left: 12px;
+            }
+            
+            .paw-right {
+                right: 12px;
+            }
+            
+            .kitten-tail {
+                right: -32px;
+                top: 32px;
+                width: 50px;
+                height: 8px;
+            }
+            
+            .speech-bubble {
+                font-size: 11px;
+                padding: 8px 12px;
+                right: -85px;
+                top: -55px;
+                border-radius: 15px;
+                border-width: 2px;
+            }
+            
+            .speech-bubble::after {
+                bottom: -8px;
+                left: 20px;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 8px solid #f0fff0;
+            }
+            
+            .sweet-messages {
+                margin: 15px 5px;
+                padding: 15px;
+                border-radius: 18px;
+                border-width: 2px;
+            }
+            
+            .message {
+                font-size: 0.95rem;
+                margin: 12px 0;
+                line-height: 1.5;
+            }
+            
+            .heart {
+                font-size: 16px;
+            }
+            
+            .paw-print {
+                font-size: 20px;
+            }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .kitten {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .kitten-head {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .speech-bubble {
+                font-size: 10px;
+                padding: 6px 10px;
+                right: -75px;
+                top: -50px;
+            }
+            
+            .sweet-messages {
+                margin: 10px 2px;
+                padding: 12px;
+            }
+            
+            .message {
+                font-size: 0.9rem;
+                margin: 10px 0;
+            }
+        }
+
+        /* Landscape mode optimizations */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .container {
+                padding-top: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            
+            .kitten {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .kitten-head {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .sweet-messages {
+                margin-top: 20px;
+                padding: 15px;
+            }
+            
+            .message {
+                font-size: 1rem;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-container" id="heartsContainer"></div>
+    <div class="paw-prints" id="pawPrints"></div>
+    
+    <div class="container">
+        <h1 class="title">Ciao Shelly!</h1>
+        <p class="subtitle">Un tenero saluto da un amico felino!</p>
+        
+        <div class="kitten-container">
+            <div class="kitten">
+                <div class="kitten-head">
+                    <div class="kitten-ears">
+                        <div class="ear left">
+                            <div class="ear-inner"></div>
+                        </div>
+                        <div class="ear right">
+                            <div class="ear-inner"></div>
+                        </div>
+                    </div>
+                    <div class="kitten-eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="whiskers">
+                        <div class="whisker left-1"></div>
+                        <div class="whisker left-2"></div>
+                        <div class="whisker right-1"></div>
+                        <div class="whisker right-2"></div>
+                    </div>
+                    <div class="kitten-nose"></div>
+                    <div class="kitten-mouth"></div>
+                </div>
+                <div class="kitten-body">
+                    <div class="kitten-paw paw-left"></div>
+                    <div class="kitten-paw paw-right"></div>
+                    <div class="kitten-tail"></div>
+                </div>
+                <div class="speech-bubble" id="greetingBubble">Ciao Shelly!</div>
+            </div>
+        </div>
+        
+        <div class="sweet-messages">
+            <div class="message">Cara Shelly, la tua dolcezza scalda il cuore!</div>
+            <div class="message">Ogni tuo sorriso illumina la giornata come un raggio di sole!</div>
+            <div class="message">Sei una persona speciale e meravigliosa!</div>
+            <div class="message">Tante fusa e coccole da questo piccolo amico peloso!</div>
+        </div>
+    </div>
+
+    <script>
+        // Funzione per ottenere il saluto in base all'orario
+        function getGreetingByTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            if (hour >= 6 && hour < 12) {
+                return "Buongiorno Shelly!";
+            } else if (hour >= 12 && hour < 18) {
+                return "Buon pomeriggio Shelly!";
+            } else if (hour >= 18 && hour < 22) {
+                return "Buonasera Shelly!";
+            } else {
+                return "Buonanotte Shelly!";
+            }
+        }
+
+        // Aggiorna il saluto all'avvio
+        document.getElementById('greetingBubble').innerHTML = getGreetingByTime();
+
+        // Crea cuoricini che fluttuano (usando simboli CSS)
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            const hearts = ['♥', '♡', '❤'];
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            document.getElementById('heartsContainer').appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 6000);
+        }
+
+        // Crea impronte di zampette (usando caratteri alternativi)
+        function createPawPrint() {
+            const pawPrint = document.createElement('div');
+            pawPrint.className = 'paw-print';
+            const paws = ['🐾', '•', '○'];
+            pawPrint.innerHTML = paws[Math.floor(Math.random() * paws.length)];
+            pawPrint.style.left = Math.random() * 100 + '%';
+            pawPrint.style.top = Math.random() * 100 + '%';
+            pawPrint.style.animationDelay = Math.random() * 3 + 's';
+            document.getElementById('pawPrints').appendChild(pawPrint);
+            
+            setTimeout(() => {
+                pawPrint.remove();
+            }, 6000);
+        }
+
+        // Genera elementi animati
+        setInterval(createHeart, 700);
+        setInterval(createPawPrint, 1800);
+
+        // Crea alcuni elementi iniziali
+        for(let i = 0; i < 6; i++) {
+            setTimeout(createHeart, i * 150);
+            setTimeout(createPawPrint, i * 300);
+        }
+
+        // Aggiungi interazione al click
+        document.querySelector('.kitten').addEventListener('click', function() {
+            // Crea più cuoricini al click
+            for(let i = 0; i < 8; i++) {
+                setTimeout(createHeart, i * 80);
+            }
+            
+            // Vibrazione su dispositivi mobili
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+            // Cambia temporaneamente il messaggio del gattino
+            const bubble = document.getElementById('greetingBubble');
+            const originalText = bubble.innerHTML;
+            const sweetMessages = ['Miao!', 'Ti voglio bene!', 'Fusa fusa!'];
+            bubble.innerHTML = sweetMessages[Math.floor(Math.random() * sweetMessages.length)];
+            
+            setTimeout(() => {
+                bubble.innerHTML = originalText;
+            }, 2000);
+        });
+
+        // Ottimizzazione per dispositivi touch
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndY < touchStartY - 50) {
+                // Swipe up - crea più cuoricini
+                for(let i = 0; i < 5; i++) {
+                    setTimeout(createHeart, i * 100);
+                }
+            }
+        }
+
+        // Prevenire zoom su doppio tap per iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
